@@ -6,11 +6,23 @@ using System.Web;
 using System.Web.Mvc;
 using Vidly.Models;
 using Vidly.ViewModels;
+using System.Data.Entity;
 
 namespace Vidly.Controllers
 {
     public class MoviesController : Controller
     {
+        private ApplicationDbContext _context;
+        public MoviesController()
+        {
+            _context = new ApplicationDbContext();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            _context.Dispose();
+        }
+        // GET: Movies
         public ActionResult Index(int? page, string sortBy)
         {
             #region Basic Example
@@ -24,19 +36,32 @@ namespace Vidly.Controllers
             //return Content(String.Format("pageindex - {0}, sortBy - {1}", page, sortBy));
             ////In URL - this will work only using a query string. Will not work as URL Path - For URL path we need a custom path
             #endregion
-            var movies = GetMovies();
+            var movies = _context.Movies.Include(m => m.Genre).ToList();
             return View(movies);
         }
 
-        public IEnumerable<Movie> GetMovies()
+        #region hardcoded files
+        //public IEnumerable<Movie> GetMovies()
+        //{
+        //    return new List<Movie>
+        //    {
+        //        new Movie{Id = 1, Name = "Charlie"},
+        //        new Movie {Id = 2, Name = "Tourist Family"}
+        //    };
+        //}
+        #endregion
+
+        public ActionResult Details(int id)
         {
-            return new List<Movie>
+            var movie = _context.Movies.Include(m => m.Genre).SingleOrDefault(m => m.Id == id);
+            if (movie == null)
             {
-                new Movie{Id = 1, Name = "Charlie"},
-                new Movie {Id = 2, Name = "Tourist Family"}
-            };
+                return HttpNotFound();
+            }
+            return View(movie);
         }
-        // GET: Movies
+
+        
         public ActionResult Random()
         {
             var movie = new Movie() { Name = "Nimo" };
