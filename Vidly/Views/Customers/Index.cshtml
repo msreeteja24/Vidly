@@ -1,0 +1,35 @@
+﻿@model IEnumerable<Vidly.Models.Customer>
+@{
+    ViewBag.Title = "Customers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Customers</h2>
+@if (!Model.Any())
+{
+    <p> There are no customers</p>
+}
+else
+{
+<table class="table	table-bordered	table-hover">
+    <thead>
+        <tr>
+            <th>Customers</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in Model)
+        {
+            <tr>
+                <td> @Html.ActionLink(customer.Name, "Details", "Customers", new {id = customer.Id}, new {@class = "nav-link"})</td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+}
+
+
+
+
+
