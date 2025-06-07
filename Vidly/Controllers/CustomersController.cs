@@ -1,12 +1,7 @@
-﻿using Microsoft.Ajax.Utilities;
-using Microsoft.AspNet.Identity;
-using System;
-using System.Collections.Generic;
+﻿using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using Vidly.Models;
-using System.Data.Entity;
 using Vidly.ViewModels;
 
 namespace Vidly.Controllers
@@ -31,7 +26,7 @@ namespace Vidly.Controllers
         public ViewResult Index()
         {
             var customers = _context.Customers.Include(c => c.MembershipType).ToList();
-            
+
             return View(customers);
 
         }
@@ -43,7 +38,7 @@ namespace Vidly.Controllers
             {
                 return HttpNotFound();
             }
-            
+
             return View(customer);
         }
 
@@ -60,13 +55,13 @@ namespace Vidly.Controllers
         [HttpPost]
         public ActionResult Save(Customer customer)
         {
-            if(customer.Id == 0)
+            if (customer.Id == 0)
             {
                 _context.Customers.Add(customer);
             }
             else
             {
-                var customerInDb = _context.Customers.Single(c=> c.Id == customer.Id);
+                var customerInDb = _context.Customers.Single(c => c.Id == customer.Id);
                 //TryUpdateModel(customerInDb, "", "Name, BirthDate"); 
                 //The above method from Controller class will update all properties which is not advisable so we use another method.
                 //Even though we write propery names to change specific properties, they are magic string and that method access all properties from Database. 
@@ -75,7 +70,7 @@ namespace Vidly.Controllers
                 //Second method
                 customerInDb.Name = customer.Name;
                 customerInDb.BirthDate = customer.BirthDate;
-                customerInDb.MembershipType = customer.MembershipType;
+                customerInDb.MembershipTypeId = customer.MembershipTypeId;
                 customerInDb.IsSubscribedToNewsletter = customer.IsSubscribedToNewsletter;
 
                 //Instead of writing all properties we can use Mapper method
@@ -84,7 +79,7 @@ namespace Vidly.Controllers
 
             }
 
-                _context.SaveChanges();
+            _context.SaveChanges();
 
             return RedirectToAction("Index", "Customers");
         }
@@ -110,7 +105,7 @@ namespace Vidly.Controllers
         //        new Customer{ Id = 1, Name ="Sree Teja"},
         //        new Customer {Id =2 , Name ="Yamini"}
         //    };
-            
+
         //}
     }
 }
