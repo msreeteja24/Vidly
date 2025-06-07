@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using Vidly.Models;
 using System.Data.Entity;
+using Vidly.ViewModels;
 
 namespace Vidly.Controllers
 {
@@ -44,6 +45,61 @@ namespace Vidly.Controllers
             }
             
             return View(customer);
+        }
+
+        public ActionResult New()
+        {
+            var membershipTypes = _context.MembershipTypes.ToList();
+            var viewModel = new CustomerFormViewModel
+            {
+                MembershipTypes = membershipTypes
+            };
+            return View("CustomerForm", viewModel);
+        }
+
+        [HttpPost]
+        public ActionResult Save(Customer customer)
+        {
+            if(customer.Id == 0)
+            {
+                _context.Customers.Add(customer);
+            }
+            else
+            {
+                var customerInDb = _context.Customers.Single(c=> c.Id == customer.Id);
+                //TryUpdateModel(customerInDb, "", "Name, BirthDate"); 
+                //The above method from Controller class will update all properties which is not advisable so we use another method.
+                //Even though we write propery names to change specific properties, they are magic string and that method access all properties from Database. 
+                //This leads to security holes.
+
+                //Second method
+                customerInDb.Name = customer.Name;
+                customerInDb.BirthDate = customer.BirthDate;
+                customerInDb.MembershipType = customer.MembershipType;
+                customerInDb.IsSubscribedToNewsletter = customer.IsSubscribedToNewsletter;
+
+                //Instead of writing all properties we can use Mapper method
+                //Mapper.Map(customer,  customerInDb); 
+                //Here we can add exceptions to update properties by creating DTO class and instead of Customer class we use DTO class in this action.
+
+            }
+
+                _context.SaveChanges();
+
+            return RedirectToAction("Index", "Customers");
+        }
+
+        public ActionResult Edit(int id)
+        {
+            var customer = _context.Customers.SingleOrDefault(c => c.Id == id);
+            if (customer == null)
+                return HttpNotFound();
+            var viewModel = new CustomerFormViewModel
+            {
+                Customer = customer,
+                MembershipTypes = _context.MembershipTypes.ToList()
+            };
+            return View("CustomerForm", viewModel);
         }
 
         //If we want to access the data by manually adding. 
