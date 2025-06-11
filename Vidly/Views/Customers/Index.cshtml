@@ -43,8 +43,8 @@ else
 
 @section scripts{
     <script>
-
-        $("#customers .js-delete").on("click", function () {
+        //to optimize we have added the filter in the on() method - so that Jquery handler is applied only to a button when clicked.
+        $("#customers").on("click",".js-delete" ,function () {
             var button = $(this);
             bootbox.confirm("Are you sure you want to delete", function (result) {
                 if (result) {
