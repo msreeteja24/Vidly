@@ -5,27 +5,22 @@
 }
 
 <h2>Customers</h2>
-@if (!Model.Any())
-{
-    <p> There are no customers</p>
-}
-else
-{
-    <table id="customers" class="table	table-bordered	table-hover">
-        <thead>
-            <tr>
-                <th>Customers</th>
-                @*<th>Discount Rate</th>*@
-                <th>Membership Type</th>
-                <th>Delete</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var customer in Model)
+@* Removing if else block because now we are fetching data from the api and in Index action we have removed the model*@
+<table id="customers" class="table	table-bordered	table-hover dataTable">
+    <thead>
+        <tr>
+            <th>Customers</th>
+            @*<th>Discount Rate</th>*@
+            <th>Membership Type</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        @* @foreach (var customer in Model)
             {
                 <tr>
                     <td> @Html.ActionLink(customer.Name, "Edit", "Customers", new { id = customer.Id }, new { @class = "nav-link" })</td>
-                    @*<td> @customer.MembershipType.DiscountRate%</td>*@
+                    @*<td> @customer.MembershipType.DiscountRate%</td>
                     <td> @customer.MembershipType.Name</td>
                     <td>
                         <button data-customer-id="@customer.Id" class="btn btn-link js-delete">
@@ -34,17 +29,40 @@ else
                     </td>
 
                 </tr>
-            }
-        </tbody>
+            }*@
+    </tbody>
 
-    </table>
-}
+</table>
 
 
 @section scripts{
     <script>
+        $("#customers").DataTable({
+            ajax: {
+                url: "api/customers",
+                dataSrc:""
+            },
+            columns: [
+                {
+                    data: "name",
+                    render: function (data, type, customer) {
+                        return "<a class = 'nav-link' href = '/customers/edit/" + customer.id + "'>" + customer.name + "</a>"
+                    }
+                },
+                {
+                    data: "name"
+                },
+                {
+                    data: "id",
+                    render: function (data) {
+                        return "<button class='btn btn-link js-delete' data-customer-id=" +data + "> Delete </button>"
+                    }
+                }
+
+            ]
+        });
         //to optimize we have added the filter in the on() method - so that Jquery handler is applied only to a button when clicked.
-        $("#customers").on("click",".js-delete" ,function () {
+        $("#customers").on("click", ".js-delete", function () {
             var button = $(this);
             bootbox.confirm("Are you sure you want to delete", function (result) {
                 if (result) {
@@ -58,6 +76,8 @@ else
                     });
                 }
             });
+
+
             //if (confirm("Are you sure you want to delete the customer")) {
             //    $.ajax({
             //        url: "/api/customers/" + button.attr("data-customer-id"),
@@ -72,19 +92,55 @@ else
         });
 
     </script>
-    }
+}
 
-    @section styles{
-        <style>
-            .bootbox-body{
-                color : red;
-            }
-            .bootbox-close-button, .close {
-                float: right !important;
-                background: none;
-                border: none;
-            }
-        </style>
+@section styles{
+    <style>
+        .bootbox-body {
+            color: red;
+        }
+
+        .bootbox-close-button, .close {
+            float: right !important;
+            background: none;
+            border: none;
+        }
+
+
+        #customers.table.dataTable {
+            clear: both;
+            margin-top: 6px !important;
+            margin-bottom: 6px !important;
+            max-width: none !important;
+            border-collapse: collapse !important;
+        }
+
+        #customers.table-bordered.dataTable th,
+        table.table-bordered.dataTable td {
+            border-left-width: 2px;
+        }
+
+        #customers.table.table-bordered.dataTable th:first-child, table.table-bordered.dataTable th:first-child,
+        table.table-bordered.dataTable td:first-child,
+        table.table-bordered.dataTable td:first-child {
+            border-left-width: 2px;
+        }
+
+        #customers.table.table-bordered.dataTable th:last-child, table.table-bordered.dataTable th:last-child,
+        table.table-bordered.dataTable td:last-child,
+        table.table-bordered.dataTable td:last-child {
+            border-right-width: 2px;
+        }
+
+        #customers.table.table-bordered.dataTable thead th {
+            border-top-width: 2px;
+            border-bottom-width: 2px;
+        }
+
+        #customers.table.table-bordered.dataTable tbody tr:last-child {
+            border-bottom-width: 2px;
+        }
+    </style>
 }
 
 
