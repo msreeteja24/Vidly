@@ -37,7 +37,11 @@ namespace Vidly.Controllers
             //var movies = _context.Movies.Include(m => m.Genre).ToList();
             //return View(movies);
 
-            return View();
+            //To restrict view to a user
+            if (User.IsInRole(RoleName.CanManageMovies))
+                return View("List");
+
+            return View("ReadOnlyList");
         }
 
         #region hardcoded files
@@ -61,6 +65,7 @@ namespace Vidly.Controllers
             return View(movie);
         }
 
+        [Authorize(Roles = RoleName.CanManageMovies)] //This will override global filter
         public ActionResult New()
         {
             var genres = _context.Genres.ToList();

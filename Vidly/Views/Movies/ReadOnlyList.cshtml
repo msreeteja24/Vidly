@@ -1,0 +1,101 @@
+﻿@model IEnumerable<Vidly.Models.Movie>
+@{
+    ViewBag.Title = "Movies";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Movies</h2>
+
+<table id="movies" class="table	table-bordered	table-hover">
+    <thead>
+        <tr>
+            <th> Movies</th>
+            <th> Genre</th>   
+        </tr>
+    </thead>
+    <tbody>
+        @*@foreach (var movie in Model)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink(movie.Name, "Edit", "Movies", new { id = movie.Id }, new { @class = "nav-link" })
+                </td>
+                <td>@movie.Genre.Name</td>
+                <td>
+                    <button data-movie-id="@movie.Id" class="btn btn-link js-delete">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }*@
+    </tbody>
+</table>
+
+@section scripts{
+    <script>
+        var table = $("#movies").DataTable({
+            ajax : {
+                url: "api/movies",
+                dataSrc : ""
+            },
+            columns: [
+                {
+                    data : "name",
+ 
+                },
+                {
+                    data : "genre.name",
+
+                }
+            ]
+        });
+
+    </script>
+}
+
+@section styles{
+    <style>
+
+        .bootbox-close-button, .close {
+            float: right !important;
+            background: none;
+            border: none;
+        }
+
+
+        #movies.table.dataTable {
+            clear: both;
+            margin-top: 6px !important;
+            margin-bottom: 6px !important;
+            max-width: none !important;
+            border-collapse: collapse !important;
+        }
+
+        #movies.table-bordered.dataTable th,
+        table.table-bordered.dataTable td {
+            border-left-width: 2px;
+        }
+
+            #movies.table.table-bordered.dataTable th:first-child, table.table-bordered.dataTable th:first-child,
+            table.table-bordered.dataTable td:first-child,
+            table.table-bordered.dataTable td:first-child {
+                border-left-width: 2px;
+            }
+
+            #movies.table.table-bordered.dataTable th:last-child, table.table-bordered.dataTable th:last-child,
+            table.table-bordered.dataTable td:last-child,
+            table.table-bordered.dataTable td:last-child {
+                border-right-width: 2px;
+            }
+
+        #movies.table.table-bordered.dataTable thead th {
+            border-top-width: 2px;
+            border-bottom-width: 2px;
+        }
+
+        #movies.table.table-bordered.dataTable tbody tr:last-child {
+            border-bottom-width: 2px;
+        }
+    </style>
+}   
+
