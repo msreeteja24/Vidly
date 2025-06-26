@@ -21,7 +21,7 @@ namespace Vidly.Controllers
             _context.Dispose();
         }
         // GET: Movies
-        public ActionResult Index(int? page, string sortBy)
+        public ActionResult Index()
         {
             #region Basic Example
             //if (!page.HasValue)
@@ -34,8 +34,10 @@ namespace Vidly.Controllers
             //return Content(String.Format("pageindex - {0}, sortBy - {1}", page, sortBy));
             ////In URL - this will work only using a query string. Will not work as URL Path - For URL path we need a custom path
             #endregion
-            var movies = _context.Movies.Include(m => m.Genre).ToList();
-            return View(movies);
+            //var movies = _context.Movies.Include(m => m.Genre).ToList();
+            //return View(movies);
+
+            return View();
         }
 
         #region hardcoded files
