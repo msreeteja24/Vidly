@@ -23,6 +23,7 @@ namespace Vidly.Controllers
         }
 
         // GET: Customers 
+        //[Authorize]  -> can be applied globally
         public ViewResult Index()
         {
             //var customers = _context.Customers.Include(c => c.MembershipType).ToList();
