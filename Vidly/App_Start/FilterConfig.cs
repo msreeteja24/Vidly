@@ -8,6 +8,7 @@ namespace Vidly
         {
             filters.Add(new HandleErrorAttribute());
             filters.Add(new AuthorizeAttribute()); //To apply authorize(not showing content without loging in globally
+            filters.Add(new RequireHttpsAttribute());
         }
     }
 }
