@@ -32,14 +32,26 @@ namespace Vidly.Controllers.Api
         //}
         #endregion
         //Using IHttpActionResult
-        public IHttpActionResult GetCustomers()
+        public IHttpActionResult GetCustomers(string query = null)
         {
-            var customersDto = _context.Customers
-                .Include(c => c.MembershipType)
+            //We will modify the below code so that weget filter when we type in rental using typeahead.
+            //Here we are also adding an optional parameter (=null : so that it is optional)
+            //var customersDto = _context.Customers
+            //    .Include(c => c.MembershipType)
+            //    .ToList()
+            //    .Select(Mapper.Map<Customer, CustomerDto>);
+
+            var customersQuery = _context.Customers
+                .Include(c => c.MembershipType);
+
+            if (!String.IsNullOrWhiteSpace(query))
+                customersQuery = customersQuery.Where(c => c.Name.Contains(query));
+
+            var customerDtos = customersQuery
                 .ToList()
                 .Select(Mapper.Map<Customer, CustomerDto>);
 
-            return Ok(customersDto);
+            return Ok(customerDtos);
         }
 
 
