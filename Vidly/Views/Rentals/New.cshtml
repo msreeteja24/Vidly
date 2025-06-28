@@ -10,14 +10,16 @@
     <div class="mb-3">
         <label> Customers </label>
         <div class="tt-container">
-            <input id="customers" type="text" value="" class="form-control" />
+            <input id="customers" name="customer" type="text" value="" class="form-control" />
+            
         </div>
     </div>
 
     <div class="mb-3">
         <label> Movies </label>
         <div class="tt-container">
-            <input id="movie" type="text" value="" class="form-control" />
+            <input id="movie" type="text" name="movie" value="" class="form-control" />
+            @*name attribute is required for the jquery validation attribute to do it's job'*@
         </div>
     </div>
 
@@ -27,10 +29,15 @@
         </div>
     </div>
 
-    <button class="btn btn-primary"> Submit </button>
+    <button type="submit" class="btn btn-primary"> Submit </button>
 </form>
 
+
+
 @section scripts{
+
+    @Scripts.Render("~/bundles/jqueryval")
+
     <script>
         $(document).ready(function () {
             var vm = {
@@ -59,6 +66,7 @@
                 source: customers
             }).on("typeahead:select", function (e, customer) {
                 vm.customerId = customer.id;
+                 
             });
 
             var movies = new Bloodhound({
@@ -82,7 +90,7 @@
                 display: 'name',
                 limit: Number.MAX_VALUE,
                 source: movies
-                }).on("typeahead:select", function (e, movie) {
+            }).on("typeahead:select", function (e, movie) {
                 $("#movies").append("<li class='list-group-item'>" + movie.name + "</li>");
 
                 $("#movie").typeahead("val", "");
@@ -90,19 +98,67 @@
                 vm.movieIds.push(movie.id);
             });
 
-            $("#newRental").submit(function (e) {
-                e.preventDefault();
+            //To add custom vadidation message - so that we get an error if we type some other name
+            $.validator.addMethod("validCustomer", function () {
+                return vm.customerId && vm.customerId !== 0;
+            }, "Please select a valid customer.");
 
-                $.ajax({
-                    url: "/api/newRentals",
-                    method: "post",
-                    data: vm
-                }).done(function () {
-                    toastr.success("Rentals successfully recorded.")
-                }).fail(function () {
-                    toastr.error("Something unexpected happened.")
+            //To add custom validation message to movies - so atleast one movie is selected
+            $.validator.addMethod("atleastOneMovie", function () {
+                return vm.movieIds.length > 0;
+            }, "Please select atleast one movie");
+
+
+            //To add validation to the form before submitting
+            var validator = $("#newRental").validate({
+                rules: {
+                    customer: { validCustomer: true },
+                    movie: { atleastOneMovie: true }
+                },
+                submitHandler: function () {
+                    //e.preventDefault(); //Here this was used in the submit event handler. So this does not work here.
+                    //So we use a different approach here, We add return false at the end of this function
+                    //- so that, when submit handler is called we immediately call the ajax function to call the sever and hen return false/
+                    //So this prevents the form from being submitted normally.
+
+                    $.ajax({
+                        url: "/api/newRentals",
+                        method: "post",
+                        data: vm
+                    }).done(function () {
+                        toastr.success("Rentals successfully recorded.")
+
+                        //In order to clear the form.
+                        $("#customers").typeahead("val", "");
+                        $("#movie").typeahead("val", "");
+                        $("#movies").empty();
+
+                        vm = { movieIds: [] }; //To reset the view model
+
+                        //In order to reset the state of the form in terms of its validation
+                        validator.resetForm();
+
+                    }).fail(function () {
+                        toastr.error("Something unexpected happened.")
                     });
+
+                    return false;
+                }
             });
+
+            //$("#newRental").submit(function (e) {
+            //    e.preventDefault();
+
+            //    $.ajax({
+            //        url: "/api/newRentals",
+            //        method: "post",
+            //        data: vm
+            //    }).done(function () {
+            //        toastr.success("Rentals successfully recorded.")
+            //    }).fail(function () {
+            //        toastr.error("Something unexpected happened.")
+            //    });
+            //});
 
         });
 
